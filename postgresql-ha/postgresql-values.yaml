@@ -1,0 +1,33 @@
+clusterDomain: k8s-cluster.Domain.local
+
+global:
+  postgresql:
+    postgresqlUsername: postgres
+    postgresqlPassword: jsay0OI3xD
+    postgresqlDatabase: postgresDatabase
+
+  podAnnotations:
+    linkerd.io/inject: enabled
+primary:
+  persistence:
+    size: 10Gi
+    storageClass: "rook-cephfs-cluster-retain"
+
+readReplicas:
+  podAnnotations:
+    linkerd.io/inject: enabled
+
+initdbScripts:
+  initdb.sql: |
+    CREATE DATABASE gitlabhq_production;
+    CREATE DATABASE harbor_coredb;
+    CREATE DATABASE harbor_notary_serverdb;
+    CREATE DATABASE harbor_notary_signerdb;
+
+postgresqlImage:
+  registry: docker.io
+  repository: bitnami/postgresql-repmgr
+  tag: 10.20.0-debian-10-r29
+
+metrics:
+  enabled: false

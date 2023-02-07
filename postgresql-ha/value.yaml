@@ -1,0 +1,61 @@
+global:
+  postgresql:
+    auth:
+      postgresPassword: jsay0OI3xD
+      username: postgres
+      password: jsay0OI3xD
+      database: postgresDatabase
+
+  podAnnotations:
+    linkerd.io/inject: enabled
+
+auth:
+  enablePostgresUser: true
+  usePasswordFiles: false
+  replicationUsername: repl_user
+  postgresPassword: jsay0OI3xD
+  username: postgres
+  password: jsay0OI3xD
+  database: postgresDatabase
+
+architecture: standalone
+replication:
+  synchronousCommit: "off"
+  numSynchronousReplicas: 0
+  applicationName: harbor
+
+primary:
+  persistence:
+    size: 10Gi
+    storageClass: "rook-cephfs-cluster-retain"
+  initdb:
+    scripts:
+      initdb.sql: |
+        CREATE DATABASE harbor_coredb;
+        CREATE DATABASE harbor_notary_serverdb;
+        CREATE DATABASE harbor_notary_signerdb;
+
+readReplicas:
+  podAnnotations:
+    linkerd.io/inject: enabled
+  podSecurityContext:
+   enabled: true
+   fsGroup: 1001
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+  hostIPC: false
+
+containerPorts:
+  postgresql: 5432
+
+
+
+image:
+  registry: docker.io
+  repository: bitnami/postgresql
+  tag: 14.2.0-debian-10-r25
+  debug: false
+
+metrics:
+  enabled: false
